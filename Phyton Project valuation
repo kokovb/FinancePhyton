@@ -1,0 +1,269 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Import packages\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 135,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Define Funtions NPV and IRR\n",
+    "\n",
+    "#Future Value \n",
+    "def FV(PV,r,t):\n",
+    "    fv=PV*(1+r/100)**t\n",
+    "    return fv\n",
+    "\n",
+    "#Present Value\n",
+    "def PV(FV,r,t):\n",
+    "    pv=FV/((1+r/100)**t)\n",
+    "    return pv\n",
+    "\n",
+    "#NPV\n",
+    "def NPV(CF,r,t):\n",
+    "    npv=sum(PV(CF,r,t))\n",
+    "    return npv\n",
+    "\n",
+    "#IRR \n",
+    "def IRR(CF):\n",
+    "    irr=np.irr(CF)*100\n",
+    "    return irr\n",
+    "\n",
+    "#COMPARE Projects\n",
+    "def C_pr_NI(CF,r,t):\n",
+    "    for i in range(0,np.size(CF[:,0])):\n",
+    "        npv=round(NPV(CF[i,:],r,t),2)\n",
+    "        irr=round(IRR(CF[i,:]),5)\n",
+    "        print(\"Project \",i,\":\",\"\\n\",\"   NPV: \",npv,\"\\n\",\"   IRR: \",irr)\n",
+    "        \n",
+    "#Compare Projects => Data Frame -------TO Do: Add Index of Project Name\n",
+    "def C_NI(CF,r,t):\n",
+    "    C_pr_df = pd.DataFrame(columns=['Project', 'NPV', 'IRR'])\n",
+    "    for i in range(0,np.size(CF[:,0])):\n",
+    "        npv=round(NPV(CF[i,:],r,t),2)\n",
+    "        irr=round(IRR(CF[i,:]),5)\n",
+    "\n",
+    "        dfsp=pd.DataFrame([[i,npv,irr]],columns=['Project', 'NPV', 'IRR'])\n",
+    "        C_pr_df=C_pr_df.append(dfsp)\n",
+    "    C_pr_df=C_pr_df.set_index('Project')    \n",
+    "    return C_pr_df\n",
+    "\n",
+    "#ADD Plot Function to compare different Projects accoring to interest rates\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Define Functions to other basic "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#EXAMPLES --------------------------------------------------------------------------------------------------------"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[102.     104.04   106.1208]\n",
+      "[98.03921569 96.11687812 94.23223345]\n",
+      "288.3883272647775\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Random example\n",
+    "\n",
+    "#Application FV\n",
+    "pv=np.array([100,100,100])\n",
+    "r=np.array([2,2,2])\n",
+    "t=np.array([1,2,3])\n",
+    "print(FV(pv,r,t))\n",
+    "\n",
+    "#Application on PV\n",
+    "fv=np.array([100,100,100])\n",
+    "r=np.array([2])\n",
+    "t=np.array([1,2,3])\n",
+    "print(PV(pv,r,t))\n",
+    "\n",
+    "print(NPV(fv,r,t))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "NPV no MBA: 308869.4 \n",
+      " IRR: nan\n",
+      "NPV with MBA: 449162.84 \n",
+      " IRR: 86.61\n",
+      "NPV no MBA and salary increase: 335524.23 \n",
+      " IRR: nan\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Application NPV Example stay in Job or take MBA\n",
+    "#NPV stay in Job\n",
+    "CFJ=np.array([0,40000,40000,40000,40000,40000,40000,40000,40000,40000,40000])\n",
+    "r=5\n",
+    "t=np.array([0,1,2,3,4,5,6,7,8,9,10])\n",
+    "print('NPV no MBA:',round(NPV(CFJ,r,t),2),\"\\n\",\"IRR:\",round(IRR(CFJ),2))\n",
+    "\n",
+    "#NPV with MBA\n",
+    "CFM=np.array([-45000,0,73000,73000,73000,73000,73000,73000,73000,73000,73000])\n",
+    "r=5\n",
+    "t=np.array([0,1,2,3,4,5,6,7,8,9,10])\n",
+    "print('NPV with MBA:',round(NPV(CFM,r,t),2),\"\\n\",\"IRR:\",round(IRR(CFM),2))\n",
+    "\n",
+    "#NPV stay in Job and increase\n",
+    "CFJi=np.array([0,40000])\n",
+    "for i in range (1,10):\n",
+    "    CFJi=np.append(CFJi,CFJi[i]*1.02)\n",
+    "r=5\n",
+    "t=np.array([0,1,2,3,4,5,6,7,8,9,10])\n",
+    "print('NPV no MBA and salary increase:',round(NPV(CFJi,r,t),2),\"\\n\",\"IRR:\",IRR(CFJi))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 136,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "               NPV        IRR\n",
+      "Project                      \n",
+      "0        298869.40  399.99996\n",
+      "1        449162.84   86.61302\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Compare two projects\n",
+    "CF=np.array([[-10000,40000,40000,40000,40000,40000,40000,40000,40000,40000,40000],\n",
+    "             [-45000,0,73000,73000,73000,73000,73000,73000,73000,73000,73000]])\n",
+    "r=5\n",
+    "t=np.array([0,1,2,3,4,5,6,7,8,9,10])\n",
+    "print(C_NI(CF,r,t))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "range(1, 4)\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(range(1,4))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 139,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "3.232306244343164"
+      ]
+     },
+     "execution_count": 139,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 142,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "241.84264611830986"
+      ]
+     },
+     "execution_count": 142,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "CF=np.array([-1000,0,0,0,0,2000])\n",
+    "r=10\n",
+    "t=np.array([0,1,2,3,4,5])\n",
+    "NPV(CF,r,t)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.1"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
